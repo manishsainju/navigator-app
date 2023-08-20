@@ -58,7 +58,7 @@ const OrdersScreen = ({ navigation }) => {
         setParams(params);
     });
 
-    const loadOrders = useCallback((options = {}) => {
+    const loadOrders = useCallback(async (options = {}) => {
         if (options.isRefreshing) {
             setIsRefreshing(true);
         }
@@ -66,11 +66,12 @@ const OrdersScreen = ({ navigation }) => {
         if (options.isQuerying) {
             setIsQuerying(true);
         }
-
+        console.log("🚀 ~ file: OrdersScreen.js:72 ~ loadOrders ~ params:", params)
+        console.log("========================================================================================================")
         return fleetbase.orders
             .query(params)
-            .then(setOrders)
-            .catch(logError)
+            .then((x) => {setOrders(x); console.log(x)})
+            .catch((e) =>console.log("manish",e))
             .finally(() => {
                 setIsRefreshing(false);
                 setIsQuerying(false);

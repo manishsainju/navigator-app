@@ -243,6 +243,7 @@ export default class HelperUtil {
      * @memberof HelperUtil
      */
     static logError(error, message) {
+        console.log("🚀 ~ file: Helper.js:246 ~ HelperUtil ~ logError ~ error:", error)
         if (error instanceof Error) {
             return console.log(`[ ${message ?? error.message} ]`, error);
         }

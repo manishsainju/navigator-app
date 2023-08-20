@@ -5,7 +5,8 @@
     "scripts": {
         "android": "react-native run-android",
         "ios": "react-native run-ios",
-        "start": "react-native start",
+        "start": "export SET NODE_OPTIONS=--openssl-legacy-provider && react-native start",
+        "build-i:android": "export SET NODE_OPTIONS=--openssl-legacy-provider && react-native run-android --variant=release",
         "pod-reset": "rm -rf ios/Pods/ ios/Podfile.lock && npx pod-install",
         "yarn-reset": "rm -rf node_modules/ package-lock.json yarn.lock && yarn install",
         "full-reset": "yarn yarn-reset && yarn pod-reset && npx jetify",

@@ -36,6 +36,9 @@ export default class StorageUtil {
      * @memberof StorageUtil
      */
     static useResourceStorage(key, ResourceType, adapter, defaultValue) {
+        console.log("🚀 ~ file: Storage.js:39 ~ StorageUtil ~ useResourceStorage ~ adapter:", adapter)
+        console.log("🚀 ~ file: Storage.js:39 ~ StorageUtil ~ useResourceStorage ~ ResourceType:", ResourceType)
+        console.log("🚀 ~ file: Storage.js:39 ~ StorageUtil ~ useResourceStorage ~ key:", key)
         const [value, setValue] = useStorage(key, defaultValue);
 
         const setResource = (resource) => {
