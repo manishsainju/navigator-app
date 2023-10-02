@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "32061789099",
+    "project_id": "katch-driver-bbeab",
+    "storage_bucket": "katch-driver-bbeab.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:32061789099:android:cf29a09ce2e83f20c5f8ee",
+        "android_client_info": {
+          "package_name": "com.navigator.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2sur9qcReOzXYCjzAkQH9q5WD-ZNB6HM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

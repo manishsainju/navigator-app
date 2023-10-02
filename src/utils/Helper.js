@@ -480,17 +480,17 @@ export default class HelperUtil {
     static async createSocketAndListen(channelId, callback) {
         // Create socket connection config
         const socketConnectionConfig = {
-            hostname: '192.168.1.38', //HelperUtil.config('SOCKETCLUSTER_HOST', 'localhost'),
-            path: HelperUtil.config('SOCKETCLUSTER_PATH', '/socketcluster/'),
-            secure: toBoolean(HelperUtil.config('SOCKETCLUSTER_SECURE', false)),
-            port: HelperUtil.config('SOCKETCLUSTER_PORT', 38000),
+            hostname: 'fleetbase-ws.katchkw.com', //HelperUtil.config('SOCKETCLUSTER_HOST', 'localhost'),
+            path: '/socketcluster/',
+            secure: toBoolean(HelperUtil.config('SOCKETCLUSTER_SECURE', true)),
+            // port: HelperUtil.config('SOCKETCLUSTER_PORT', 38000),
             autoConnect: true,
             autoReconnect: true,
         };
 
         // Create socket connection
         const socket = socketClusterClient.create(socketConnectionConfig);
-
+        
         // Listen for socket connection errors
         (async () => {
             // eslint-disable-next-line no-unused-vars

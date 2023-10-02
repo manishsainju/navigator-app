@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "506545008803",
+    "firebase_url": "https://snatch-aktech.firebaseio.com",
+    "project_id": "snatch-aktech",
+    "storage_bucket": "snatch-aktech.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:506545008803:android:5783046e9eeff4af728f16",
+        "android_client_info": {
+          "package_name": "com.navigator.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "506545008803-jtpogu9frqg72ioedbrqvpau16inf89j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.navigator.app",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "506545008803-tcubtdf4fov4q1smhnb61emigds3amsp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBApI6secvTQoq8jFiAaTcQkElEla5ar3g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "506545008803-tcubtdf4fov4q1smhnb61emigds3amsp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
