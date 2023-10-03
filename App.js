@@ -7,7 +7,7 @@
 
 import 'react-native-gesture-handler';
 import 'react-native-get-random-values';
-import React from 'react';
+import React, { useEffect } from 'react';
 import type { Node } from 'react';
 import { Platform, Text, View, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -16,6 +16,7 @@ import CoreStack from './src/features/Core/CoreStack';
 import { config } from './src/utils';
 import Toast from 'react-native-toast-message';
 import tailwind from 'tailwind';
+import RNBootSplash from 'react-native-bootsplash';
 
 const isAndroid = Platform.OS === 'android';
 const Stack = createStackNavigator();
@@ -26,7 +27,12 @@ const linking = {
     },
 };
 
+
 const App: () => Node = () => {
+    useEffect(() => {
+        
+        RNBootSplash.hide();
+    }, [])
     return (
         <>
             <NavigationContainer
