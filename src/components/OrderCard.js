@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { formatDuration, formatKm } from 'utils';
 import OrderStatusBadge from './OrderStatusBadge';
 import OrderWaypoints from './OrderWaypoints';
+import { playSound } from '../utils/playSound';
 
 const OrderCard = ({
     order,
@@ -26,6 +27,11 @@ const OrderCard = ({
     const scheduledAt = order.scheduledAt ? format(order.scheduledAt, 'PPpp') : null;
     const createdAt = order.createdAt ? format(order.createdAt, 'PPpp') : null;
 
+    useEffect(() => {
+        if (order.getAttribute('status') === 'created' || order.getAttribute('status') === 'dispatched') {
+            playSound.play();
+        }
+    }, [order.getAttribute('status')]);
     return (
         <View style={[tailwind('p-2'), wrapperStyle]}>
             <TouchableOpacity style={[tailwind('bg-gray-900 border border-gray-800 rounded-xl shadow-sm w-full'), containerStyle]} onPress={onPress}>

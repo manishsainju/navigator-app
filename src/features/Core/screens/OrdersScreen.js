@@ -28,6 +28,7 @@ import OrdersFilterBar from 'components/OrdersFilterBar';
 import OrderCard from 'components/OrderCard';
 import SimpleOrdersMetrics from 'components/SimpleOrdersMetrics';
 import config from 'config';
+import { playSound } from '../../../utils/playSound';
 
 const { addEventListener, removeEventListener } = EventRegister;
 const REFRESH_NEARBY_ORDERS_MS = 6000 * 5; // 5 mins
@@ -68,6 +69,18 @@ const OrdersScreen = ({ navigation }) => {
         }
         setParams((prevParams) => ({ ...prevParams, [key]: updatedValue }));
     }, []);
+
+    useEffect(() => {
+        const hasCreatedOrDispatched = orders.some(order => {
+            const status = order.getAttribute('status');
+            console.log(status);
+
+            return status === 'created' || status === 'dispatched';
+        });
+        if (!hasCreatedOrDispatched) {
+            playSound.stop();
+        }
+    }, [isRefreshing, isQuerying]);
 
     const loadOrders = useCallback((options = {}) => {
         if (options.isRefreshing) {

@@ -76,10 +76,10 @@ const EntityScreen = ({ navigation, route }) => {
                             <View style={tailwind('mb-4 mt-2 px-6')}>
                                 <View style={tailwind('flex rounded-md bg-blue-900 border border-blue-700')}>
                                     <View style={tailwind('flex flex-row')}>
-                                        <TouchableOpacity onPress={() => navigation.push('ProofScreen', { _entity: entity.serialize(), _order: order.serialize() })} style={tailwind('flex-1 px-3 py-2 flex items-center justify-center')}>
+                                        {/* <TouchableOpacity onPress={() => navigation.push('ProofScreen', { _entity: entity.serialize(), _order: order.serialize() })} style={tailwind('flex-1 px-3 py-2 flex items-center justify-center')}>
                                             <FontAwesomeIcon icon={faBarcode} style={tailwind('text-blue-50 mb-1')} />
                                             <Text style={tailwind('text-blue-50')}>Add Proof of Delivery</Text>
-                                        </TouchableOpacity>
+                                        </TouchableOpacity> */}
                                         {/* <TouchableOpacity style={tailwind('flex-1 px-3 py-2 flex items-center justify-center')}>
                                             <FontAwesomeIcon icon={faPen} style={tailwind('text-blue-50 mb-1')} />
                                             <Text style={tailwind('text-blue-50')}>Edit Details</Text>
