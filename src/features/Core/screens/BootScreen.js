@@ -56,6 +56,9 @@ const BootScreen = ({ navigation }) => {
                 }, 300);
             });
     }, [isMounted, driver]);
+    useEffect(() => {
+        RNBootSplash.hide()
+    }, [])
 
     return (
         <SafeAreaView style={tailwind('bg-gray-900')}>

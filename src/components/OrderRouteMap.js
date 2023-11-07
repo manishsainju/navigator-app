@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, Dimensions, Linking } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 import { tailwind } from 'tailwind';
@@ -13,11 +13,10 @@ const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 const OrderRouteMap = ({ order, onPress, wrapperStyle, containerStyle, onMapReady }) => {
-
     const map = useRef();
     const isMultiDropOrder = !isEmpty(order.getAttribute('payload.waypoints', []));
 
-    const getCurrentLeg = (order) => {
+    const getCurrentLeg = order => {
         const payload = order.getAttribute('payload');
         const { waypoints, current_waypoint } = payload;
 
@@ -25,12 +24,12 @@ const OrderRouteMap = ({ order, onPress, wrapperStyle, containerStyle, onMapRead
             return false;
         }
 
-        return waypoints.find((waypoint) => {
+        return waypoints.find(waypoint => {
             return waypoint.id === current_waypoint;
         });
     };
 
-    const getFirstWaypoint = (order) => {
+    const getFirstWaypoint = order => {
         const payload = order.getAttribute('payload');
 
         if (payload?.pickup) {
@@ -46,7 +45,7 @@ const OrderRouteMap = ({ order, onPress, wrapperStyle, containerStyle, onMapRead
         return firstWaypoint;
     };
 
-    const getLastWaypoint = (order) => {
+    const getLastWaypoint = order => {
         const payload = order.getAttribute('payload');
 
         if (payload?.dropoff) {
@@ -62,14 +61,14 @@ const OrderRouteMap = ({ order, onPress, wrapperStyle, containerStyle, onMapRead
         return lastWaypoint;
     };
 
-    const getMiddleWaypoints = (order) => {
+    const getMiddleWaypoints = order => {
         const payload = order.getAttribute('payload');
         const { waypoints, pickup, dropoff } = payload;
 
         if (!pickup && !dropoff && waypoints.length) {
             const middleWaypoints = waypoints.slice(1, waypoints.length - 1);
 
-            middleWaypoints.forEach((waypoint) => {
+            middleWaypoints.forEach(waypoint => {
                 waypoint.completed = waypoint.status_code === 'COMPLETED';
             });
 
@@ -79,7 +78,7 @@ const OrderRouteMap = ({ order, onPress, wrapperStyle, containerStyle, onMapRead
         return waypoints ?? [];
     };
 
-    const startCall = (phone) => {
+    const startCall = phone => {
         if (phone) {
             Linking.openURL(`tel:${phone}`);
         }
@@ -93,11 +92,26 @@ const OrderRouteMap = ({ order, onPress, wrapperStyle, containerStyle, onMapRead
 
     const initialRegionCoordinates = {
         latitude: firstWaypoint?.location.coordinates[1],
-        longitude: firstWaypoint?.location.coordinates[0]
+        longitude: firstWaypoint?.location.coordinates[0],
     };
+
+    const generateMapLink = () => {
+        var latDes = lastWaypoint.location.coordinates[1];
+        var longDes = lastWaypoint.location.coordinates[0];
+        const url = 'https://www.google.com/maps/dir/?api=1';
+        var origin = '&origin=' + firstWaypoint.location.coordinates[1] + ',' + firstWaypoint.location.coordinates[0];
+        var destination = '&destination=' + latDes + ',' + longDes;
+        var newUrl = url + origin + destination;
+        return newUrl;
+    }
 
     return (
         <View style={[tailwind(''), wrapperStyle]}>
+            <TouchableOpacity>
+                <Text style={tailwind('text-xl font-semibold text-white mb-3')} onPress={() => Linking.openURL(generateMapLink())}>
+                    View Route google Map
+                </Text>
+            </TouchableOpacity>
             <MapView
                 ref={map}
                 onMapReady={() => {
@@ -112,17 +126,15 @@ const OrderRouteMap = ({ order, onPress, wrapperStyle, containerStyle, onMapRead
                     ...initialRegionCoordinates,
                     latitudeDelta: 1.0922,
                     longitudeDelta: 0.0421,
-                }}
-            >
+                }}>
                 {firstWaypoint && (
                     <Marker
                         coordinate={{
                             latitude: firstWaypoint.location.coordinates[1],
                             longitude: firstWaypoint.location.coordinates[0],
-                        }}
-                    >
+                        }}>
                         <View style={tailwind('bg-blue-500 shadow-sm rounded-full w-8 h-8 flex items-center justify-center')}>
-                            <Text style={tailwind('font-bold text-white')}>1</Text>
+                            <Text style={tailwind('font-bold text-white')}>P</Text>
                         </View>
                     </Marker>
                 )}
@@ -133,10 +145,9 @@ const OrderRouteMap = ({ order, onPress, wrapperStyle, containerStyle, onMapRead
                         coordinate={{
                             latitude: waypoint.location.coordinates[1],
                             longitude: waypoint.location.coordinates[0],
-                        }}
-                    >
+                        }}>
                         <View style={tailwind('bg-green-500 shadow-sm rounded-full w-8 h-8 flex items-center justify-center')}>
-                            <Text style={tailwind('font-bold text-white')}>{i + 2}</Text>
+                            <Text style={tailwind('font-bold text-white')}>{i + 2 === 2 ? 'D' : i + 2}</Text>
                         </View>
                     </Marker>
                 ))}
@@ -146,10 +157,9 @@ const OrderRouteMap = ({ order, onPress, wrapperStyle, containerStyle, onMapRead
                         coordinate={{
                             latitude: lastWaypoint.location.coordinates[1],
                             longitude: lastWaypoint.location.coordinates[0],
-                        }}
-                    >
+                        }}>
                         <View style={tailwind('bg-red-500 shadow-sm rounded-full w-8 h-8 flex items-center justify-center')}>
-                            <Text style={tailwind('font-bold text-white')}>{middleWaypoints.length + 2}</Text>
+                            <Text style={tailwind('font-bold text-white')}>{middleWaypoints.length + 2 === 2 ? 'D' : middleWaypoints.length + 2}</Text>
                         </View>
                     </Marker>
                 )}

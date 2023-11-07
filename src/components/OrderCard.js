@@ -32,8 +32,9 @@ const OrderCard = ({
                 {headerTop}
                 <View style={[tailwind('border-b border-gray-800 py-3 px-3 flex flex-row items-start justify-between'), headerStyle]}>
                     <View style={[tailwind('flex flex-col')]}>
-                        <Text style={[tailwind('text-white font-semibold mb-1'), textStyle, orderIdStyle]}>{order.id}</Text>
-                        {order.hasAttribute('internal_id') && <Text style={[tailwind('text-gray-50 font-semibold mb-1'), textStyle, orderIdStyle]}>{order.getAttribute('internal_id')}</Text>}
+                        <Text style={[tailwind('text-white font-semibold text-lg'), textStyle, orderIdStyle]}>Store : {order?.meta?.storeName || 'NA'}</Text>
+                        <Text style={[tailwind('text-white font-semibold text-lg'), textStyle, orderIdStyle]}>Order Number: {order?.meta?.orderNumber || order.id} </Text>
+                        {/* {order.hasAttribute('internal_id') && <Text style={[tailwind('text-gray-50 font-semibold mb-1'), textStyle, orderIdStyle]}>{order.getAttribute('internal_id')}</Text>} */}
                         <Text style={[tailwind('text-gray-50 mb-1'), textStyle, dateStyle]}>{scheduledAt ?? createdAt}</Text>
                         <View style={[tailwind('flex flex-row'), textStyle]}>
                             <Text style={[tailwind('text-gray-100'), textStyle, timeStyle]}>{formatDuration(order.getAttribute('time'))}</Text>

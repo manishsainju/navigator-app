@@ -215,6 +215,10 @@ export default class FormatUtil {
             return <FastImage source={{ uri: value }} style={[{ width: 100, height: 100 }]} />;
         }
 
+        if (typeof value === 'number') {
+            return `${value}`;
+        }
+
         if (isValidDate(new Date(value))) {
             return formatDate(new Date(value), 'PPpp');
         }

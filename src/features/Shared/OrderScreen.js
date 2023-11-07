@@ -52,7 +52,7 @@ const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-const isObjectEmpty = (obj) => isEmpty(obj) || Object.values(obj).length === 0;
+const isObjectEmpty = obj => isEmpty(obj) || Object.values(obj).length === 0;
 
 const OrderScreen = ({ navigation, route }) => {
     const { data } = route.params;
@@ -84,7 +84,7 @@ const OrderScreen = ({ navigation, route }) => {
     const scheduledAt = order.isAttributeFilled('scheduled_at') ? format(new Date(order.getAttribute('scheduled_at')), 'PPpp') : null;
     const createdAt = format(new Date(order.getAttribute('created_at')), 'PPpp');
     const customer = order.getAttribute('customer');
-    const destination = [order.getAttribute('payload.pickup'), ...order.getAttribute('payload.waypoints', []), order.getAttribute('payload.dropoff')].find((place) => {
+    const destination = [order.getAttribute('payload.pickup'), ...order.getAttribute('payload.waypoints', []), order.getAttribute('payload.dropoff')].find(place => {
         return place?.id === order.getAttribute('payload.current_waypoint');
     });
     const canNavigate = order.getAttribute('payload.current_waypoint') !== null && destination && order.isInProgress && config('MAPBOX_ACCESS_TOKEN') !== null;
@@ -102,11 +102,11 @@ const OrderScreen = ({ navigation, route }) => {
         }
 
         // create groups
-        order.getAttribute('payload.waypoints', []).forEach((waypoint) => {
+        order.getAttribute('payload.waypoints', []).forEach(waypoint => {
             const destination = waypoint?.id;
 
             if (destination) {
-                const entities = order.getAttribute('payload.entities', []).filter((entity) => entity.destination === destination);
+                const entities = order.getAttribute('payload.entities', []).filter(entity => entity.destination === destination);
 
                 if (entities.length === 0) {
                     return;
@@ -200,7 +200,7 @@ const OrderScreen = ({ navigation, route }) => {
     // deliver states -> created -> preparing -> dispatched -> driver_enroute -> completed
     // pickup states -> created -> preparing -> ready -> completed
 
-    const catchError = (error) => {
+    const catchError = error => {
         if (!error) {
             return;
         }
@@ -223,7 +223,7 @@ const OrderScreen = ({ navigation, route }) => {
             });
     };
 
-    const setOrderDestination = (waypoint) => {
+    const setOrderDestination = waypoint => {
         if (!waypoint) {
             return;
         }
@@ -246,7 +246,7 @@ const OrderScreen = ({ navigation, route }) => {
         order
             .start(params)
             .then(setOrder)
-            .catch((error) => {
+            .catch(error => {
                 if (error?.message?.startsWith('Order has not been dispatched')) {
                     return Alert.alert('Order Not Dispatched Yet', 'This order is not yet dispatched, are you sure you want to continue?', [
                         {
@@ -310,12 +310,29 @@ const OrderScreen = ({ navigation, route }) => {
         }
     };
 
-    const sendOrderActivityUpdate = (activity) => {
+    const sendOrderActivityUpdate = activity => {
         setIsLoadingActivity(true);
 
         if (activity.require_pod) {
             actionSheetRef.current?.setModalVisible(false);
             return navigation.push('ProofScreen', { activity, _order: order.serialize(), _waypoint: destination });
+        }
+
+        if (activity.code === 'completed') {
+            if (order?.meta?.cash !== '0 KD') {
+                Alert.alert('Confirm', `Have you collected the Cash (${order.meta.cash}) ? `, [
+                    {
+                        text: 'I have collected the cash',
+                        onPress: () => {},
+                    },
+                    {
+                        text: 'Cancel',
+                        onPress: () => {
+                            return loadOrder();
+                        },
+                    },
+                ]);
+            }
         }
 
         return order
@@ -328,9 +345,8 @@ const OrderScreen = ({ navigation, route }) => {
             });
     };
 
-    const completeOrder = (activity) => {
+    const completeOrder = activity => {
         setIsLoadingActivity(true);
-
         return order
             .complete()
             .then(setOrder)
@@ -341,7 +357,7 @@ const OrderScreen = ({ navigation, route }) => {
             });
     };
 
-    const focusPlaceOnMap = (place) => {
+    const focusPlaceOnMap = place => {
         if (!map) {
             return;
         }
@@ -363,7 +379,7 @@ const OrderScreen = ({ navigation, route }) => {
         });
     };
 
-    const handleMetafieldPress = useCallback((metaValue) => {
+    const handleMetafieldPress = useCallback(metaValue => {
         if (typeof metaValue === 'string' && metaValue.startsWith('http')) {
             Linking.openURL(metaValue);
         }
@@ -386,7 +402,7 @@ const OrderScreen = ({ navigation, route }) => {
     }, [nextActivity]);
 
     useEffect(() => {
-        const watchNotifications = addEventListener('onNotification', (notification) => {
+        const watchNotifications = addEventListener('onNotification', notification => {
             loadOrder();
         });
 
@@ -422,12 +438,13 @@ const OrderScreen = ({ navigation, route }) => {
             <View style={[tailwind('z-50 bg-gray-800 border-b border-gray-900 shadow-lg pt-2')]}>
                 <View style={tailwind('flex flex-row items-start justify-between px-4 py-2 overflow-hidden')}>
                     <View style={tailwind('flex items-start')}>
-                        <Text style={tailwind('text-xl font-semibold text-white')}>{order.id}</Text>
+                        <Text style={tailwind('text-xl text-white')}>Order: #{order?.meta?.orderNumber || order.id}</Text>
+                        <Text style={tailwind('text-xl text-white')}>Store: {order?.meta?.storeName || 'NA'}</Text>
                         <Text style={tailwind('text-gray-50 mb-1')}>{scheduledAt ?? createdAt}</Text>
-                        <View style={tailwind('flex flex-row')}>
+                        {/* <View style={tailwind('flex flex-row')}>
                             <OrderStatusBadge status={order.getAttribute('status')} wrapperStyle={tailwind('flex-grow-0')} />
                             {order.getAttribute('status') === 'created' && order.isDispatched && <OrderStatusBadge status={'dispatched'} wrapperStyle={tailwind('ml-1')} />}
-                        </View>
+                        </View> */}
                     </View>
                     <View>
                         <TouchableOpacity onPress={() => navigation.goBack()} style={tailwind('')}>
@@ -503,8 +520,7 @@ const OrderScreen = ({ navigation, route }) => {
             <ScrollView
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
-                refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={() => loadOrder({ isRefreshing: true })} tintColor={getColorCode('text-blue-200')} />}
-            >
+                refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={() => loadOrder({ isRefreshing: true })} tintColor={getColorCode('text-blue-200')} />}>
                 <View style={tailwind('flex w-full h-full pb-60')}>
                     <View style={tailwind('flex flex-row items-center justify-center')}>
                         <View style={tailwind('w-full')}>
@@ -528,8 +544,7 @@ const OrderScreen = ({ navigation, route }) => {
                                         <View style={tailwind('flex flex-row')}>
                                             <TouchableOpacity
                                                 onPress={toggleChangeDestinationWaypoint}
-                                                style={tailwind('flex-1 px-2 py-2 border-r border-blue-700 flex items-center justify-center')}
-                                            >
+                                                style={tailwind('flex-1 px-2 py-2 border-r border-blue-700 flex items-center justify-center')}>
                                                 <FontAwesomeIcon icon={faRoute} style={tailwind('text-blue-50 mb-1')} />
                                                 <Text style={tailwind('text-blue-50')}>Change</Text>
                                             </TouchableOpacity>
@@ -539,8 +554,7 @@ const OrderScreen = ({ navigation, route }) => {
                                             </TouchableOpacity> */}
                                             <TouchableOpacity
                                                 onPress={() => navigation.push('NavigationScreen', { _order: order.serialize(), _destination: destination })}
-                                                style={tailwind('flex-1 px-2 py-2 flex items-center justify-center')}
-                                            >
+                                                style={tailwind('flex-1 px-2 py-2 flex items-center justify-center')}>
                                                 <FontAwesomeIcon icon={faLocationArrow} style={tailwind('text-blue-50 mb-1')} />
                                                 <Text style={tailwind('text-blue-50')}>Navigate</Text>
                                             </TouchableOpacity>
@@ -564,31 +578,6 @@ const OrderScreen = ({ navigation, route }) => {
                         </View>
                         <View style={tailwind('mt-2')}>
                             <View style={tailwind('flex flex-col items-center')}>
-                                <View style={tailwind('flex flex-row items-center justify-between w-full p-4 border-t border-b border-gray-700')}>
-                                    <View style={tailwind('flex flex-row items-center')}>
-                                        <Text style={tailwind('font-semibold text-gray-100')}>Customer</Text>
-                                    </View>
-                                </View>
-                                <View style={tailwind('w-full p-4')}>
-                                    {customer ? (
-                                        <View style={tailwind('flex flex-row')}>
-                                            <View>
-                                                <FastImage source={{ uri: customer.photo_url }} style={tailwind('w-14 h-14 mr-4 rounded-md')} />
-                                            </View>
-                                            <View>
-                                                <Text style={tailwind('font-semibold text-gray-50')}>{customer.name}</Text>
-                                                <Text style={tailwind('text-gray-50')}>{customer.phone}</Text>
-                                                <Text style={tailwind('text-gray-50')}>{customer.email}</Text>
-                                            </View>
-                                        </View>
-                                    ) : (
-                                        <Text style={tailwind('text-gray-100')}>No Customer</Text>
-                                    )}
-                                </View>
-                            </View>
-                        </View>
-                        <View style={tailwind('mt-2')}>
-                            <View style={tailwind('flex flex-col items-center')}>
                                 <View style={tailwind('flex flex-row items-center justify-between w-full p-4 border-t border-b border-gray-700 mb-1')}>
                                     <View style={tailwind('flex flex-row items-center')}>
                                         <Text style={tailwind('font-semibold text-gray-100')}>Details</Text>
@@ -603,73 +592,12 @@ const OrderScreen = ({ navigation, route }) => {
                                             <OrderStatusBadge status={order.getAttribute('status')} style={tailwind('px-3 py-0.5')} />
                                         </View>
                                     </View>
-                                    <View style={tailwind('flex flex-row items-center justify-between py-2 px-3')}>
-                                        <View style={tailwind('flex-1')}>
-                                            <Text style={tailwind('text-gray-100')}>Internal ID</Text>
-                                        </View>
-                                        <View style={tailwind('flex-1 flex-col items-end')}>
-                                            <Text style={tailwind('text-gray-100')}>{order.getAttribute('internal_id')}</Text>
-                                        </View>
-                                    </View>
-                                    <View style={tailwind('flex flex-row items-center justify-between py-2 px-3')}>
-                                        <View style={tailwind('flex-1')}>
-                                            <Text style={tailwind('text-gray-100')}>Order Type</Text>
-                                        </View>
-                                        <View style={tailwind('flex-1 flex-col items-end')}>
-                                            <Text style={tailwind('text-gray-100')}>{order.getAttribute('type')}</Text>
-                                        </View>
-                                    </View>
-                                    <View style={tailwind('flex flex-row items-center justify-between py-2 px-3')}>
-                                        <View style={tailwind('flex-1')}>
-                                            <Text style={tailwind('text-gray-100')}>Tracking Number</Text>
-                                        </View>
-                                        <View style={tailwind('flex-1 flex-col items-end')}>
-                                            <Text style={tailwind('text-gray-100')}>{order.getAttribute('tracking_number.tracking_number')}</Text>
-                                        </View>
-                                    </View>
-                                    <View style={tailwind('flex flex-row items-center justify-between py-2 px-3')}>
-                                        <View style={tailwind('flex-1')}>
-                                            <Text style={tailwind('text-gray-100')}>Date Created</Text>
-                                        </View>
-                                        <View style={tailwind('flex-1 flex-col items-end')}>
-                                            <Text style={tailwind('text-gray-100')}>{order.createdAt ? format(order.createdAt, 'PPpp') : 'None'}</Text>
-                                        </View>
-                                    </View>
-                                    <View style={tailwind('flex flex-row items-center justify-between py-2 px-3')}>
-                                        <View style={tailwind('flex-1')}>
-                                            <Text style={tailwind('text-gray-100')}>Date Scheduled</Text>
-                                        </View>
-                                        <View style={tailwind('flex-1 flex-col items-end')}>
-                                            <Text style={tailwind('text-gray-100')}>{order.scheduledAt ? format(order.scheduledAt, 'PPpp') : 'None'}</Text>
-                                        </View>
-                                    </View>
-                                    <View style={tailwind('flex flex-row items-center justify-between py-2 px-3')}>
-                                        <View style={tailwind('flex-1')}>
-                                            <Text style={tailwind('text-gray-100')}>Date Dispatched</Text>
-                                        </View>
-                                        <View style={tailwind('flex-1 flex-col items-end')}>
-                                            <Text style={tailwind('text-gray-100')}>{order.dispatchedAt ? format(order.dispatchedAt, 'PPpp') : 'None'}</Text>
-                                        </View>
-                                    </View>
-                                    <View style={tailwind('flex flex-row items-center justify-between py-2 px-3')}>
-                                        <View style={tailwind('flex-1')}>
-                                            <Text style={tailwind('text-gray-100')}>Date Started</Text>
-                                        </View>
-                                        <View style={tailwind('flex-1 flex-col items-end')}>
-                                            <Text style={tailwind('text-gray-100')}>{order.startedAt ? format(order.startedAt, 'PPpp') : 'None'}</Text>
-                                        </View>
-                                    </View>
                                 </View>
                             </View>
                         </View>
                         {!isObjectEmpty(order.meta) && (
                             <View style={tailwind('mt-2')}>
                                 <View style={tailwind('flex flex-col items-center')}>
-                                    <View style={tailwind('flex flex-row items-center justify-between w-full p-4 border-t border-b border-gray-700 mb-1')}>
-                                        <View style={tailwind('flex flex-row items-center')}>
-                                            <Text style={tailwind('font-semibold text-gray-100')}>Metadata/ More Details</Text>
-                                        </View>
-                                    </View>
                                     <View style={tailwind('w-full py-2 -mt-1')}>
                                         {isArray(Object.keys(order.meta)) &&
                                             Object.keys(order.meta).map((key, index) => (
@@ -688,7 +616,7 @@ const OrderScreen = ({ navigation, route }) => {
                                 </View>
                             </View>
                         )}
-                        <View style={tailwind('mt-2')}>
+                        {/* <View style={tailwind('mt-2')}>
                             <View style={tailwind('flex flex-col items-center')}>
                                 <View style={tailwind('flex flex-row items-center justify-between w-full p-4 border-t border-b border-gray-700')}>
                                     <View style={tailwind('flex flex-row items-center')}>
@@ -704,7 +632,7 @@ const OrderScreen = ({ navigation, route }) => {
                                     </View>
                                 </View>
                             </View>
-                        </View>
+                        </View> */}
                         <View style={tailwind('mt-2')}>
                             <View style={tailwind('flex flex-col items-center')}>
                                 <View style={tailwind('flex flex-row items-center justify-between w-full p-4 border-t border-b border-gray-700')}>
@@ -742,11 +670,9 @@ const OrderScreen = ({ navigation, route }) => {
                                                                             <View key={ii} style={tailwind('w-40')}>
                                                                                 <View style={tailwind('pb-2 pr-2')}>
                                                                                     <TouchableOpacity
-                                                                                        onPress={() => navigation.push('EntityScreen', { _entity: entity, _order: order.serialize() })}
-                                                                                    >
+                                                                                        onPress={() => navigation.push('EntityScreen', { _entity: entity, _order: order.serialize() })}>
                                                                                         <View
-                                                                                            style={tailwind('flex items-center justify-center py-4 px-1 border border-gray-700 rounded-md')}
-                                                                                        >
+                                                                                            style={tailwind('flex items-center justify-center py-4 px-1 border border-gray-700 rounded-md')}>
                                                                                             <FastImage
                                                                                                 source={{ uri: entity.photo_url }}
                                                                                                 style={{ width: 50, height: 50, marginBottom: 5 }}
@@ -836,14 +762,14 @@ const OrderScreen = ({ navigation, route }) => {
                                                                 {entity.description ?? 'No description'}
                                                             </Text>
                                                             <View>
-                                                                {entity.meta?.variants?.map((variant) => (
+                                                                {entity.meta?.variants?.map(variant => (
                                                                     <View key={variant.id}>
                                                                         <Text style={tailwind('text-xs text-gray-200')}>{variant.name}</Text>
                                                                     </View>
                                                                 ))}
                                                             </View>
                                                             <View>
-                                                                {entity.meta?.addons?.map((addon) => (
+                                                                {entity.meta?.addons?.map(addon => (
                                                                     <View key={addon.id}>
                                                                         <Text style={tailwind('text-xs text-gray-200')}>+ {addon.name}</Text>
                                                                     </View>
@@ -909,8 +835,7 @@ const OrderScreen = ({ navigation, route }) => {
                 nestedScrollEnabled={true}
                 statusBarTranslucent={true}
                 defaultOverlayOpacity={isLoadingAction ? 0.8 : 0.65}
-                onMomentumScrollEnd={() => actionSheetRef.current?.handleChildScrollEnd()}
-            >
+                onMomentumScrollEnd={() => actionSheetRef.current?.handleChildScrollEnd()}>
                 <View style={{ minHeight: 800 }}>
                     {actionSheetAction === 'update_activity' && (
                         <View style={tailwind('w-full h-full')}>
@@ -934,8 +859,7 @@ const OrderScreen = ({ navigation, route }) => {
                                                 <View key={index} style={tailwind('mb-4')}>
                                                     <TouchableOpacity
                                                         style={[tailwind('btn bg-green-900 border border-green-700 px-4'), getStatusColors(activity.code, true).statusWrapperStyle]}
-                                                        onPress={() => sendOrderActivityUpdate(activity)}
-                                                    >
+                                                        onPress={() => sendOrderActivityUpdate(activity)}>
                                                         {isLoadingActivity && <ActivityIndicator color={getColorCode('text-green-50')} style={tailwind('ml-8 mr-3')} />}
                                                         <View style={tailwind('w-full flex flex-col items-start py-2')}>
                                                             <Text style={tailwind(`font-bold text-lg text-${getStatusColors(activity.code).color}-50`)}>{activity.status}</Text>
@@ -943,8 +867,7 @@ const OrderScreen = ({ navigation, route }) => {
                                                             {activity.require_pod && (
                                                                 <View style={tailwind('mt-3')}>
                                                                     <View
-                                                                        style={tailwind('rounded-md px-2 py-1 bg-yellow-400 border border-yellow-700 shadow-sm flex flex-row items-center')}
-                                                                    >
+                                                                        style={tailwind('rounded-md px-2 py-1 bg-yellow-400 border border-yellow-700 shadow-sm flex flex-row items-center')}>
                                                                         <FontAwesomeIcon icon={faLightbulb} style={tailwind('text-yellow-900 mr-2')} />
                                                                         <Text style={tailwind('font-semibold text-yellow-900')}>Requires proof of delivery</Text>
                                                                     </View>

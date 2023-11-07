@@ -48,6 +48,8 @@ const LoginScreen = ({ navigation, route }) => {
                 })
                 .catch((error) => {
                     logError(error);
+                    setIsAwaitingVerification(true);
+
                     setIsLoading(false);
                     Toast.show({
                         type: 'error',

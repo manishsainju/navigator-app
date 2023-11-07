@@ -121,7 +121,7 @@ const OrderWaypoints = ({ order, onPress, wrapperStyle, containerStyle, textStyl
                                 <View style={tailwind('w-full flex-row items-start mb-4')}>
                                     <View style={tailwind('mr-3')}>
                                         <View style={tailwind('rounded-full bg-blue-500 w-8 h-8 flex items-center justify-center')}>
-                                            <Text style={tailwind('font-bold text-white')}>1</Text>
+                                            <Text style={tailwind('font-bold text-white')}>P</Text>
                                         </View>
                                     </View>
                                     <View style={tailwind('w-4/5')}>
@@ -223,7 +223,7 @@ const OrderWaypoints = ({ order, onPress, wrapperStyle, containerStyle, textStyl
                                 <View style={tailwind('w-full flex-row items-end')}>
                                     <View style={tailwind('mr-3')}>
                                         <View style={tailwind('rounded-full bg-red-500 w-8 h-8 flex items-center justify-center')}>
-                                            <Text style={tailwind('font-bold text-white')}>{middleWaypoints.length + 2}</Text>
+                                            <Text style={tailwind('font-bold text-white')}>{'D'}</Text>
                                         </View>
                                     </View>
                                     <View style={tailwind('w-full')}>
