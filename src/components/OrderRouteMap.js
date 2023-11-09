@@ -103,15 +103,32 @@ const OrderRouteMap = ({ order, onPress, wrapperStyle, containerStyle, onMapRead
         var destination = '&destination=' + latDes + ',' + longDes;
         var newUrl = url + origin + destination;
         return newUrl;
-    }
+    };
+
+    const getDirections = () => {
+        const direction = order.status;
+        var latDes = lastWaypoint.location.coordinates[1];
+        var longDes = lastWaypoint.location.coordinates[0];
+        var origin = firstWaypoint.location.coordinates[1] + ',' + firstWaypoint.location.coordinates[0];
+        var destination = latDes + ',' + longDes;
+        const url = 'https://maps.google.com/maps?saddr=My+Location&daddr=';
+        var newUrl = direction === 'driver_pickedup' || direction === 'driver_enroute' ? url + destination : url + origin;
+        console.log(newUrl);
+        return newUrl;
+    };
 
     return (
         <View style={[tailwind(''), wrapperStyle]}>
-            <TouchableOpacity>
-                <Text style={tailwind('text-xl font-semibold text-white mb-3')} onPress={() => Linking.openURL(generateMapLink())}>
-                    View Route google Map
-                </Text>
-            </TouchableOpacity>
+            <View style={tailwind('flex items-center')}>
+                <TouchableOpacity style={tailwind('bg-blue-500 py-2 px-4 rounded mb-3')} onPress={() => Linking.openURL(generateMapLink())}>
+                    <Text style={tailwind('text-xl font-semibold text-white')}>View Route on Google Map</Text>
+                </TouchableOpacity>
+                {order.status !== 'completed' && (
+                    <TouchableOpacity style={tailwind('bg-green-500 py-2 px-4 rounded mb-3')} onPress={() => Linking.openURL(getDirections())}>
+                        <Text style={tailwind('text-xl font-semibold text-white')}>Get Next Stop Directions</Text>
+                    </TouchableOpacity>
+                )}
+            </View>
             <MapView
                 ref={map}
                 onMapReady={() => {
