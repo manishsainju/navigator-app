@@ -109,6 +109,18 @@ const getTotalDistance = (orders = []) => {
     return distance;
 };
 
+const totalCash = (orders = []) => {
+    if (!isArray(orders)) {
+        return 0;
+    }
+    const totalCod = orders.reduce((sum, order) => {
+        const cod = parseFloat(order?.meta?.cash?.replace(/[^\d.]/g, '')) || 0;
+        return sum + cod;
+    }, 0);
+
+    return totalCod;
+};
+
 export {
     listCountries,
     isArray,
@@ -154,5 +166,6 @@ export {
     getTotalDistance,
     createSocketAndListen,
     listenForOrdersFromSocket,
-    createNewOrderLocalNotificationObject
+    createNewOrderLocalNotificationObject,
+    totalCash,
 };
