@@ -30,8 +30,10 @@ const OrderCard = ({
     useEffect(() => {
         if (order.getAttribute('status') === 'created' || order.getAttribute('status') === 'dispatched') {
             playSound.play();
+            playSound.setNumberOfLoops(-1);
         }
     }, [order.getAttribute('status')]);
+
     return (
         <View style={[tailwind('p-2'), wrapperStyle]}>
             <TouchableOpacity style={[tailwind('bg-gray-900 border border-gray-800 rounded-xl shadow-sm w-full'), containerStyle]} onPress={onPress}>
