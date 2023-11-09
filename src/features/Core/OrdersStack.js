@@ -53,7 +53,7 @@ const OrderScreenStack = ({ route }) => {
                 <OrderStack.Screen name="OrderScreen" component={OrderScreen} options={{ headerShown: false }} initialParams={route.params ?? {}} />
                 <OrderStack.Screen name="EntityScreen" component={EntityScreen} options={{ headerShown: false }} initialParams={route.params ?? {}} />
                 <OrderStack.Screen name="NavigationScreen" component={NavigationScreen} options={{ headerShown: false }} initialParams={route.params ?? {}} />
-                <OrderStack.Screen name="ProofScreen" component={ProofScreen} options={{ headerShown: false }} initialParams={route.params ?? {}} />
+                {/* <OrderStack.Screen name="ProofScreen" component={ProofScreen} options={{ headerShown: false }} initialParams={route.params ?? {}} /> */}
             </OrderStack.Navigator>
         </SafeAreaProvider>
     );

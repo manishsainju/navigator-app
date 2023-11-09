@@ -44,6 +44,7 @@ import OrderWaypoints from 'components/OrderWaypoints';
 import OrderRouteMap from 'components/OrderRouteMap';
 import MapView, { Marker } from 'react-native-maps';
 import tailwind from 'tailwind';
+import { playSound } from '../../utils/playSound';
 
 const { addEventListener, removeEventListener } = EventRegister;
 const { width, height } = Dimensions.get('window');
@@ -252,6 +253,7 @@ const OrderScreen = ({ navigation, route }) => {
                         {
                             text: 'Yes',
                             onPress: () => {
+                                playSound.stop();
                                 return startOrder({ skipDispatch: true });
                             },
                         },
@@ -313,10 +315,10 @@ const OrderScreen = ({ navigation, route }) => {
     const sendOrderActivityUpdate = activity => {
         setIsLoadingActivity(true);
 
-        if (activity.require_pod) {
-            actionSheetRef.current?.setModalVisible(false);
-            return navigation.push('ProofScreen', { activity, _order: order.serialize(), _waypoint: destination });
-        }
+        // if (activity.require_pod) {
+        //     actionSheetRef.current?.setModalVisible(false);
+        //     return navigation.push('ProofScreen', { activity, _order: order.serialize(), _waypoint: destination });
+        // }
 
         if (activity.code === 'completed') {
             if (order?.meta?.cash !== '0 KD') {
@@ -379,9 +381,14 @@ const OrderScreen = ({ navigation, route }) => {
         });
     };
 
-    const handleMetafieldPress = useCallback(metaValue => {
+    const handleMetafieldPress = useCallback((metaKey, metaValue) => {
         if (typeof metaValue === 'string' && metaValue.startsWith('http')) {
             Linking.openURL(metaValue);
+        } else if (metaKey === 'customerPhone' || metaKey === 'storePhone') {
+            const phoneNumber = metaValue.replace(/[^0-9]/g, '');
+            if (phoneNumber) {
+                Linking.openURL(`tel:${phoneNumber}`);
+            }
         }
     });
 
@@ -605,7 +612,7 @@ const OrderScreen = ({ navigation, route }) => {
                                                     <View style={tailwind('w-20')}>
                                                         <Text style={tailwind('text-gray-100')}>{titleize(key)}</Text>
                                                     </View>
-                                                    <TouchableOpacity onPress={() => handleMetafieldPress(order.meta[key])} style={tailwind('flex-1 flex-col items-end')}>
+                                                    <TouchableOpacity onPress={() => handleMetafieldPress(key, order.meta[key])} style={tailwind('flex-1 flex-col items-end')}>
                                                         <Text style={tailwind('text-gray-100')} numberOfLines={1}>
                                                             {formatMetaValue(order.meta[key])}
                                                         </Text>
