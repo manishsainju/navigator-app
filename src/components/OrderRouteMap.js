@@ -95,23 +95,8 @@ const OrderRouteMap = ({ order, onPress, wrapperStyle, containerStyle, onMapRead
         longitude: firstWaypoint?.location.coordinates[0],
     };
 
-    const generateMapLink = () => {
-        var latDes = lastWaypoint.location.coordinates[1];
-        var longDes = lastWaypoint.location.coordinates[0];
-        const url = 'https://www.google.com/maps/dir/?api=1';
-        var origin = '&origin=' + firstWaypoint.location.coordinates[1] + ',' + firstWaypoint.location.coordinates[0];
-        var destination = '&destination=' + latDes + ',' + longDes;
-        var newUrl = url + origin + destination;
-        return newUrl;
-    }
-
     return (
         <View style={[tailwind(''), wrapperStyle]}>
-            <TouchableOpacity>
-                <Text style={tailwind('text-xl font-semibold text-white mb-3')} onPress={() => Linking.openURL(generateMapLink())}>
-                    View Route google Map
-                </Text>
-            </TouchableOpacity>
             <MapView
                 ref={map}
                 onMapReady={() => {

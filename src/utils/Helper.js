@@ -490,21 +490,24 @@ export default class HelperUtil {
         // Create socket connection
         const socket = socketClusterClient.create(socketConnectionConfig);
 
-        // Listen for socket connection errors
-        (async () => {
-            // eslint-disable-next-line no-unused-vars
-            for await (let event of socket.listener('error')) {
-                console.log('[Socket Error]', event);
-            }
-        })();
+        socket.listener('connect');
+        socket.listener('error');
 
-        // Listen for socket connection
-        (async () => {
-            // eslint-disable-next-line no-unused-vars
-            for await (let event of socket.listener('connect')) {
-                console.log('[Socket Connected]', event);
-            }
-        })();
+        // // Listen for socket connection errors
+        // (async () => {
+        //     // eslint-disable-next-line no-unused-vars
+        //     for await (let event of socket.listener('error')) {
+        //         console.log('[Socket Error]', event);
+        //     }
+        // })();
+
+        // // Listen for socket connection
+        // (async () => {
+        //     // eslint-disable-next-line no-unused-vars
+        //     for await (let event of socket.listener('connect')) {
+        //         console.log('[Socket Connected]', event);
+        //     }
+        // })();
 
         // create channel from channel id
         const channel = socket.subscribe(channelId);

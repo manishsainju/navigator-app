@@ -14,7 +14,7 @@ import tailwind from 'tailwind';
 import PhoneInput from 'components/PhoneInput';
 
 const isPhone = (phone = '') => {
-    return /^[+]?[\s./0-9]*[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/g.test(phone);
+    return /\+965[0-9]{8}$/.test(phone);
 };
 
 const LoginScreen = ({ navigation, route }) => {
@@ -35,9 +35,15 @@ const LoginScreen = ({ navigation, route }) => {
 
     const sendVerificationCode = useCallback(() => {
         setIsLoading(true);
-
-        console.log('[phone]', phone);
-
+        if (!isPhone(phone)) {
+            Toast.show({
+                type: 'error',
+                text1: 'Phone number is not correct',
+                text2: 'Please enter the correct number. It has to be 8 digit only.',
+            });
+            setIsLoading(false);
+            return;
+        }
         try {
             return fleetbase.drivers
                 .login(phone)
@@ -47,15 +53,18 @@ const LoginScreen = ({ navigation, route }) => {
                     setIsLoading(false);
                 })
                 .catch((error) => {
+                    console.log("🚀 ~ file: LoginScreen.js:55 ~ sendVerificationCode ~ error:", error)
+                    console.log("🚀 ~ file: LoginScreen.js:56 ~ sendVerificationCode ~ log:", error.message)
                     logError(error);
                     setIsAwaitingVerification(true);
-
+                    
                     setIsLoading(false);
                     Toast.show({
                         type: 'error',
                         text1: '😅 Authentication Failed',
                         text2: error.message,
                     });
+                    setError(null);
                 });
         } catch (error) {
             logError(error);
@@ -112,7 +121,7 @@ const LoginScreen = ({ navigation, route }) => {
                     <Pressable onPress={Keyboard.dismiss} style={[tailwind('px-5 -mt-28'), config('ui.loginScreen.contentContainerStyle')]}>
                         <KeyboardAvoidingView style={tailwind('')} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={100}>
                             <View style={tailwind('mb-10 flex items-center justify-center rounded-full')}>
-                                <FastImage source={require('../../../../assets/icon.png')} style={tailwind('w-20 h-20 rounded-full')} />
+                                <FastImage source={require('../../../../assets/katch-app-icon.png')} style={tailwind('w-20 h-20 rounded-full')} />
                             </View>
 
                             {isNotAwaitingVerification && (
@@ -121,7 +130,7 @@ const LoginScreen = ({ navigation, route }) => {
                                         <PhoneInput
                                             onChangeValue={setPhone}
                                             autoFocus={true}
-                                            defaultCountryCode={deepGet(location, 'country', '+1')}
+                                            defaultCountryCode={'KW'}
                                             style={[tailwind('flex-1'), config('ui.loginScreen.phoneInputStyle')]}
                                             {...(config('ui.createAccountScreen.phoneInputProps') ?? {})}
                                         />

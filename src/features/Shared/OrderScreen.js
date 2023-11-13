@@ -85,9 +85,18 @@ const OrderScreen = ({ navigation, route }) => {
     const scheduledAt = order.isAttributeFilled('scheduled_at') ? format(new Date(order.getAttribute('scheduled_at')), 'PPpp') : null;
     const createdAt = format(new Date(order.getAttribute('created_at')), 'PPpp');
     const customer = order.getAttribute('customer');
-    const destination = [order.getAttribute('payload.pickup'), ...order.getAttribute('payload.waypoints', []), order.getAttribute('payload.dropoff')].find(place => {
-        return place?.id === order.getAttribute('payload.current_waypoint');
-    });
+    const [destination, setDestination] = useState(null);
+
+    useEffect(() => {
+        if (order) {
+            if (order.status === 'created') {
+                setDestination(order.getAttribute('payload.pickup'));
+            } else {
+                setDestination(order.getAttribute('payload.dropoff'));
+            }
+        }
+    }, [order]);
+
     const canNavigate = order.getAttribute('payload.current_waypoint') !== null && destination && order.isInProgress && config('MAPBOX_ACCESS_TOKEN') !== null;
     const canSetDestination = isMultiDropOrder && order.isInProgress && !destination;
     const isAdhoc = order.getAttribute('adhoc') === true;
@@ -249,21 +258,9 @@ const OrderScreen = ({ navigation, route }) => {
             .then(setOrder)
             .catch(error => {
                 if (error?.message?.startsWith('Order has not been dispatched')) {
-                    return Alert.alert('Order Not Dispatched Yet', 'This order is not yet dispatched, are you sure you want to continue?', [
-                        {
-                            text: 'Yes',
-                            onPress: () => {
-                                playSound.stop();
-                                return startOrder({ skipDispatch: true });
-                            },
-                        },
-                        {
-                            text: 'Cancel',
-                            onPress: () => {
-                                return loadOrder();
-                            },
-                        },
-                    ]);
+                    // skip dispatch and procceed
+                    playSound.stop();
+                    return startOrder({ skipDispatch: true });
                 }
                 logError(error);
             })
@@ -440,6 +437,22 @@ const OrderScreen = ({ navigation, route }) => {
         focusPlaceOnMap(destination);
     }
 
+    const generateMapLink = (source, destinationPoint) => {
+        if (!source && destinationPoint) {
+            const url = `https://www.google.com/maps/dir/Current+Location/${destinationPoint.location.coordinates[1]},${destinationPoint.location.coordinates[0]}`;
+            Linking.openURL(url);
+        } else if (source && destinationPoint && source.location && destinationPoint.location) {
+            const {
+                location: { coordinates: sPoint },
+            } = source;
+            const {
+                location: { coordinates: dPoint },
+            } = destinationPoint;
+            const url = `https://www.google.com/maps/dir/?api=1&origin=${sPoint[1] + ',' + sPoint[0]}&destination=${dPoint[1] + ',' + dPoint[0]}`;
+            Linking.openURL(url);
+        }
+    };
+
     return (
         <View style={[tailwind('bg-gray-800 h-full')]}>
             <View style={[tailwind('z-50 bg-gray-800 border-b border-gray-900 shadow-lg pt-2')]}>
@@ -504,7 +517,7 @@ const OrderScreen = ({ navigation, route }) => {
                                 </View>
                             </TouchableOpacity>
                         )}
-                        {canNavigate && (
+                        {/* {canNavigate || true && (
                             <TouchableOpacity style={tailwind('mt-2')} onPress={() => navigation.push('NavigationScreen', { _order: order.serialize(), _destination: destination })}>
                                 <View style={tailwind('btn bg-blue-900 border border-blue-700 py-0 px-4 w-full')}>
                                     <View style={tailwind('flex flex-row justify-start')}>
@@ -514,13 +527,45 @@ const OrderScreen = ({ navigation, route }) => {
                                         </View>
                                         <View style={tailwind('flex-1 py-2 px-2 flex items-center')}>
                                             <Text numberOfLines={1} style={tailwind('text-blue-50 text-base')}>
-                                                {destination.address}
+                                                {destination?.address}
                                             </Text>
                                         </View>
                                     </View>
                                 </View>
                             </TouchableOpacity>
-                        )}
+
+                        )} */}
+                        <TouchableOpacity style={tailwind('mt-2')} onPress={() => generateMapLink(null, order.getAttribute('payload.pickup'))}>
+                            <View style={tailwind('btn bg-blue-900 border border-blue-700 py-0 px-4 w-full')}>
+                                <View style={tailwind('flex flex-row justify-start')}>
+                                    <View style={tailwind('border-r border-blue-700 py-2 pr-4 flex flex-row items-center')}>
+                                        <FontAwesomeIcon icon={faLocationArrow} style={tailwind('text-blue-50 mr-2')} />
+                                        <Text style={tailwind('font-semibold text-blue-50 text-base')}>Pickup Point</Text>
+                                    </View>
+                                    <View style={tailwind('flex-1 py-2 px-2 flex items-center')}>
+                                        <Text numberOfLines={1} style={tailwind('text-blue-50 text-base')}>
+                                            {order.getAttribute('payload.pickup.address')}
+                                        </Text>
+                                    </View>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={tailwind('mt-2')} onPress={() => generateMapLink(null, order.getAttribute('payload.dropoff'))}>
+                            <View style={tailwind('btn bg-red-900 border border-red-700 py-0 px-4 w-full')}>
+                                <View style={tailwind('flex flex-row justify-start')}>
+                                    <View style={tailwind('border-r border-red-700 py-2 pr-4 flex flex-row items-center')}>
+                                        <FontAwesomeIcon icon={faLocationArrow} style={tailwind('text-blue-50 mr-2')} />
+                                        <Text style={tailwind('font-semibold text-red-50 text-base')}>Dropoff Point</Text>
+                                    </View>
+                                    <View style={tailwind('flex-1 py-2 px-2 flex items-center')}>
+                                        <Text numberOfLines={1} style={tailwind('text-blue-50 text-base')}>
+                                            {order.getAttribute('payload.dropoff.address')}
+                                        </Text>
+                                    </View>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </View>
@@ -536,7 +581,7 @@ const OrderScreen = ({ navigation, route }) => {
                     </View>
                     <View style={tailwind('bg-gray-800 ')}>
                         <View style={tailwind('px-4 pb-3 pt-4')}>
-                            {destination && order.isInProgress && (
+                            {destination && order.isInProgress && false && (
                                 <View style={tailwind('mb-4')}>
                                     <View style={tailwind('flex rounded-md bg-blue-900 border border-blue-700')}>
                                         <View style={tailwind('px-4 py-2 flex-1 border-b border-blue-700')}>
@@ -548,24 +593,24 @@ const OrderScreen = ({ navigation, route }) => {
                                                 </View>
                                             )}
                                         </View>
-                                        <View style={tailwind('flex flex-row')}>
-                                            <TouchableOpacity
+                                        {/* <View style={tailwind('flex flex-row')}> */}
+                                        {/* <TouchableOpacity
                                                 onPress={toggleChangeDestinationWaypoint}
                                                 style={tailwind('flex-1 px-2 py-2 border-r border-blue-700 flex items-center justify-center')}>
                                                 <FontAwesomeIcon icon={faRoute} style={tailwind('text-blue-50 mb-1')} />
                                                 <Text style={tailwind('text-blue-50')}>Change</Text>
-                                            </TouchableOpacity>
-                                            {/* <TouchableOpacity style={tailwind('flex-1 px-2 py-2 border-r border-blue-700 flex items-center justify-center')}>
+                                            </TouchableOpacity> */}
+                                        {/* <TouchableOpacity style={tailwind('flex-1 px-2 py-2 border-r border-blue-700 flex items-center justify-center')}>
                                                 <FontAwesomeIcon icon={faMagic} style={tailwind('text-blue-50 mb-1')} />
                                                 <Text style={tailwind('text-blue-50')}>Optimize</Text>
                                             </TouchableOpacity> */}
-                                            <TouchableOpacity
+                                        {/* <TouchableOpacity
                                                 onPress={() => navigation.push('NavigationScreen', { _order: order.serialize(), _destination: destination })}
                                                 style={tailwind('flex-1 px-2 py-2 flex items-center justify-center')}>
                                                 <FontAwesomeIcon icon={faLocationArrow} style={tailwind('text-blue-50 mb-1')} />
                                                 <Text style={tailwind('text-blue-50')}>Navigate</Text>
-                                            </TouchableOpacity>
-                                        </View>
+                                            </TouchableOpacity> */}
+                                        {/* </View> */}
                                     </View>
                                 </View>
                             )}

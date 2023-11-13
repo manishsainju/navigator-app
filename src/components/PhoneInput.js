@@ -22,17 +22,7 @@ function findDialCodeFromCountryCode(code) {
     return null;
 }
 
-const PhoneInput = ({
-    value,
-    onCountryCodeSelected,
-    onChangePhone,
-    onChangeValue,
-    defaultCountryCode = '+1',
-    placeholder = '+1 (999) 999 9999',
-    style = {},
-    wrapperStyle = {},
-    autoFocus = true,
-}) => {
+const PhoneInput = ({ value, onCountryCodeSelected, onChangePhone, onChangeValue, defaultCountryCode = '+1', placeholder = '12345678', style = {}, wrapperStyle = {}, autoFocus = true }) => {
     const windowHeight = Dimensions.get('window').height;
 
     const [show, setShow] = useState(false);
@@ -62,11 +52,11 @@ const PhoneInput = ({
     return (
         <View style={[tailwind('flex flex-1'), { height: 52, elevation: 3 }, wrapperStyle]}>
             <View style={[tailwind('form-input flex flex-row items-center px-1.5 py-1 border border-gray-100 rounded-md bg-white shadow-sm'), { height: 52, elevation: 3 }, style]}>
-                <TouchableOpacity onPress={() => setShow(true)} style={tailwind('bg-gray-200 rounded-lg py-1.5 px-2')}>
+                <TouchableOpacity onPress={() => null} style={tailwind('bg-gray-200 rounded-lg py-1.5 px-2')}>
                     <Text style={tailwind('text-gray-900')}>{countryCode}</Text>
                 </TouchableOpacity>
                 <TextInput
-                    style={[tailwind('h-12 px-2 w-full rounded-md')]}
+                    style={[tailwind('h-12 px-2 w-full rounded-md text-black')]}
                     value={value}
                     onChangeText={(text) => {
                         if (typeof onChangePhone === 'function') {
