@@ -29,7 +29,7 @@
         "build-i:android": "react-native run-android --variant=release",
         "build:android": "cd android && ./gradlew bundleRelease",
         "generate-app-icon": "npx app-icon generate -i ./assets/katch-app-icon.png",
-        "generate-launch-screen": "npx react-native generate-bootsplash ./assets/katch-rider-splash.png --background-color=#111827 --logo-width=400 --flavor=main"
+        "generate-launch-screen": "npx react-native generate-bootsplash ./assets/katch-rider-splash.png --background-color=#29b34b --logo-width=400 --flavor=main"
     },
     "dependencies": {
         "@babel/plugin-proposal-async-generator-functions": "^7.17.12",
