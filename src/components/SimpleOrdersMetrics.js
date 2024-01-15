@@ -4,6 +4,7 @@ import { pluralize, formatDuration, formatMetersToKilometers, getActiveOrdersCou
 import { Order } from '@fleetbase/sdk';
 import { tailwind } from 'tailwind';
 import { format } from 'date-fns';
+import { totalCash } from '../utils';
 
 const SimpleOrdersMetrics = ({ orders, date = new Date(), wrapperStyle, containerStyle }) => {
     return (
@@ -14,7 +15,7 @@ const SimpleOrdersMetrics = ({ orders, date = new Date(), wrapperStyle, containe
                     <View style={tailwind('flex flex-row items-center mb-1')}>
                         <Text style={tailwind('text-base text-gray-100')}>{pluralize(getActiveOrdersCount(orders), 'order')}</Text>
                         <Text style={tailwind('text-base text-gray-100 mx-2')}>•</Text>
-                        <Text style={tailwind('text-base text-gray-100')}>{`${getTotalStops(orders)} stops`}</Text>
+                        <Text style={tailwind('text-base text-gray-100')}>{`${totalCash(orders)} KD`}</Text>
                         <Text style={tailwind('text-base text-gray-100 mx-2')}>•</Text>
                         <Text style={tailwind('text-base text-gray-100')}>{formatDuration(getTotalDuration(orders))}</Text>
                         <Text style={tailwind('text-base text-gray-100 mx-2')}>•</Text>
