@@ -1,4 +1,4 @@
-package com.fleetbase.navigator;
+package com.aktech.driver;
 
 import android.app.Application;
 import com.facebook.react.PackageList;

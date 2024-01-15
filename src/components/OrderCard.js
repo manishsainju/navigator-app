@@ -29,7 +29,7 @@ const OrderCard = ({
 
     useEffect(() => {
         if (order.getAttribute('status') === 'created' || order.getAttribute('status') === 'dispatched') {
-            playSound.play();
+            playSound.setNumberOfLoops(-1).play();
         }
     }, [order.getAttribute('status')]);
     return (
