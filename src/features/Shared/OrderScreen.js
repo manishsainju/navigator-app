@@ -317,6 +317,9 @@ const OrderScreen = ({ navigation, route }) => {
         //     return navigation.push('ProofScreen', { activity, _order: order.serialize(), _waypoint: destination });
         // }
 
+        if (activity.code === 'driver_ack') {
+            playSound.stop();
+        }
         if (activity.code === 'completed') {
             if (order?.meta?.cash !== '0 KD') {
                 Alert.alert('Confirm', `Have you collected the Cash (${order.meta.cash}) ? `, [
@@ -658,9 +661,7 @@ const OrderScreen = ({ navigation, route }) => {
                                                         <Text style={tailwind('text-gray-100')}>{titleize(key)}</Text>
                                                     </View>
                                                     <TouchableOpacity onPress={() => handleMetafieldPress(key, order.meta[key])} style={tailwind('flex-1 flex-col items-end')}>
-                                                        <Text style={tailwind('text-gray-100')} numberOfLines={1}>
-                                                            {formatMetaValue(order.meta[key])}
-                                                        </Text>
+                                                        <Text style={tailwind('text-gray-100')}>{formatMetaValue(order.meta[key])}</Text>
                                                     </TouchableOpacity>
                                                 </View>
                                             ))}
