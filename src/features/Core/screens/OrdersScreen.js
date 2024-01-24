@@ -182,6 +182,16 @@ const OrdersScreen = ({ navigation }) => {
         });
     }, []);
 
+    useEffect(() => {
+        const hasCreatedOrDispatched = orders.some(order => {
+            const status = order.getAttribute('status');
+            return status === 'created' || status === 'dispatched';
+        });
+        if (!hasCreatedOrDispatched) {
+            playSound.stop();
+        }
+    }, [orders])
+
     return (
         <View style={[tailwind('bg-gray-800 h-full')]}>
             <View style={tailwind('px-4 border-b border-gray-900')}>
