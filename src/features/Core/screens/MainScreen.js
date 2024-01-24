@@ -23,6 +23,7 @@ import OrdersStack from 'core/OrdersStack';
 import ScheduleStack from 'core/ScheduleStack';
 import RoutesScreen from './RoutesScreen';
 import WalletScreen from './WalletScreen';
+import { playSound } from '../../../utils/playSound';
 
 const { addEventListener, removeEventListener } = EventRegister;
 const Tab = createBottomTabNavigator();
@@ -119,6 +120,7 @@ const MainScreen = ({ navigation, route }) => {
             if (typeof event === 'string' && notifiableEvents.includes(event)) {
                 let localNotificationObject = createNewOrderLocalNotificationObject(order, driver);
                 PushNotification.localNotification(localNotificationObject);
+                playSound.setNumberOfLoops(-1).play();
             }
         });
     }, []);
