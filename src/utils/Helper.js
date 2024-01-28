@@ -546,7 +546,7 @@ export default class HelperUtil {
         const isAdhocOrder = !isOrderAssigned;
 
         let title = `📦 New Incoming Order`;
-        let message = `New order assigned ${order.id}`;
+        let message = `New order assigned ${order?.meta?.orderNumber || order.id} from ${order?.meta?.storeName || '-'} `;
         let subtitle = `Pickup at ${HelperUtil.deepGet(order, 'payload.pickup.street1')}`;
 
         if (isAdhocOrder) {

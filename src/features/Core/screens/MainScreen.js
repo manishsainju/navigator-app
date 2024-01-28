@@ -23,6 +23,8 @@ import OrdersStack from 'core/OrdersStack';
 import ScheduleStack from 'core/ScheduleStack';
 import RoutesScreen from './RoutesScreen';
 import WalletScreen from './WalletScreen';
+import notifee from '@notifee/react-native';
+
 
 const { addEventListener, removeEventListener } = EventRegister;
 const Tab = createBottomTabNavigator();
@@ -115,10 +117,26 @@ const MainScreen = ({ navigation, route }) => {
     useEffect(() => {
         const notifiableEvents = ['order.ready', 'order.ping', 'order.driver_assigned', 'order.dispatched'];
 
-        listenForOrdersFromSocket(`driver.${driver.id}`, (order, event) => {
+        listenForOrdersFromSocket(`driver.${driver.id}`, async (order, event) => {
             if (typeof event === 'string' && notifiableEvents.includes(event)) {
                 let localNotificationObject = createNewOrderLocalNotificationObject(order, driver);
-                PushNotification.localNotification(localNotificationObject);
+                const channelId = await notifee.createChannel({
+                    id: 'default',
+                    name: 'Default Channel',
+                });
+                // Display a notification
+                await notifee.displayNotification({
+                    title: localNotificationObject.title,
+                    body: localNotificationObject.message,
+                    android: {
+                        channelId,
+                        // pressAction is needed if you want the notification to open the app when pressed
+                        pressAction: {
+                            id: 'default',
+                        },
+                    },
+                });
+                // PushNotification.localNotification(localNotificationObject);
             }
         });
     }, []);
