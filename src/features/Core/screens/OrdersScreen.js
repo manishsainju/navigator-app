@@ -78,8 +78,15 @@ const OrdersScreen = ({ navigation }) => {
 
         // Get the token
         const token = await messaging().getToken();
-        console.log(driver.id, token);
-
+        // FIXME: change with prod url and move to env
+        fetch(`http://localhost:3000/fleetInternal/v1/register/fcm/${driver.id}/${token}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then((response) => {
+            console.log(response, "FXME, REMOVE AFTER TESTING --- TEST WORKING")
+        })
     }
     useEffect(() => {
         onAppBootstrap();
