@@ -21,12 +21,14 @@ buildscript {
         classpath('com.android.tools.build:gradle:7.3.1')
         classpath("com.facebook.react:react-native-gradle-plugin")
         classpath("de.undercouch:gradle-download-task:4.1.2")
-        classpath('com.google.gms:google-services:4.3.15')
+        // classpath('com.google.gms:google-services:4.3.15')
+        classpath 'com.google.gms:google-services:4.4.0'
     }
 }
 
 allprojects {
     repositories {
+        maven { url "$rootDir/../node_modules/@notifee/react-native/android/libs" }
          maven {
             url 'https://api.mapbox.com/downloads/v2/releases/maven'
             authentication {

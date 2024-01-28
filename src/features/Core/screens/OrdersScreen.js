@@ -5,6 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faSatelliteDish } from '@fortawesome/free-solid-svg-icons';
 import { EventRegister } from 'react-native-event-listeners';
 import { useDriver, useMountedState, useResourceCollection, useFleetbase } from 'hooks';
+import messaging from '@react-native-firebase/messaging';
+
 import {
     logError,
     getColorCode,
@@ -68,6 +70,19 @@ const OrdersScreen = ({ navigation }) => {
             updatedValue = format(value, 'dd-MM-yyyy');
         }
         setParams((prevParams) => ({ ...prevParams, [key]: updatedValue }));
+    }, []);
+
+    async function onAppBootstrap() {
+        // Register the device with FCM
+        await messaging().registerDeviceForRemoteMessages();
+
+        // Get the token
+        const token = await messaging().getToken();
+        console.log(driver.id, token);
+
+    }
+    useEffect(() => {
+        onAppBootstrap();
     }, []);
 
     useEffect(() => {
