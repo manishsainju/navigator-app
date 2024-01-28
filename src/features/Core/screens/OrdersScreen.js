@@ -31,8 +31,8 @@ import config from 'config';
 import { playSound } from '../../../utils/playSound';
 
 const { addEventListener, removeEventListener } = EventRegister;
-const REFRESH_NEARBY_ORDERS_MS = 6000 * 5; // 5 mins
-const REFRESH_ORDERS_MS = 6000 * 10; // 10 mins
+const REFRESH_NEARBY_ORDERS_MS = 6000 * 0.5; // 5 mins
+const REFRESH_ORDERS_MS = 6000 * 0.5; // 10 mins
 
 const OrdersScreen = ({ navigation }) => {
     const isMounted = useMountedState();

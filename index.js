@@ -3,6 +3,7 @@
  */
 
 import { AppRegistry, Alert } from 'react-native';
+import '@azure/core-asynciterator-polyfill';
 import App from './App';
 import { name as appName } from './app.json';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
