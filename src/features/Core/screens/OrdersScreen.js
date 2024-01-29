@@ -32,6 +32,7 @@ import SimpleOrdersMetrics from 'components/SimpleOrdersMetrics';
 import config from 'config';
 import { playSound } from '../../../utils/playSound';
 
+const { ADMIN_API } = config;
 const { addEventListener, removeEventListener } = EventRegister;
 const REFRESH_NEARBY_ORDERS_MS = 6000 * 0.5; // 5 mins
 const REFRESH_ORDERS_MS = 6000 * 0.5; // 10 mins
@@ -41,7 +42,7 @@ const OrdersScreen = ({ navigation }) => {
     const fleetbase = useFleetbase();
     const calendar = useRef();
     const [driver, setDriver] = useDriver();
-
+    
     const [date, setDateValue] = useState(new Date());
     const [params, setParams] = useState({
         driver: driver.id,
@@ -69,34 +70,36 @@ const OrdersScreen = ({ navigation }) => {
             setDateValue(value);
             updatedValue = format(value, 'dd-MM-yyyy');
         }
-        setParams((prevParams) => ({ ...prevParams, [key]: updatedValue }));
+        setParams(prevParams => ({ ...prevParams, [key]: updatedValue }));
     }, []);
-
+    
     async function onAppBootstrap() {
         // Register the device with FCM
         await messaging().registerDeviceForRemoteMessages();
 
         // Get the token
         const token = await messaging().getToken();
-        // FIXME: change with prod url and move to env
-        fetch(`http://localhost:3000/fleetInternal/v1/register/fcm/${driver.id}/${token}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        }).then((response) => {
-            console.log(response, "FXME, REMOVE AFTER TESTING --- TEST WORKING")
-        })
+        if (driver) {
+            const url = `${ADMIN_API}/v1/fleetInternal/register/fcm/${driver.id}/${token}`
+            fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then(response => {
+                console.log(response, 'FXME, REMOVE AFTER TESTING --- TEST WORKING');
+            });
+        }
     }
     useEffect(() => {
         onAppBootstrap();
     }, []);
-
+    
     useEffect(() => {
         const hasCreatedOrDispatched = orders.some(order => {
             const status = order.getAttribute('status');
             console.log(status);
-
+            
             return status === 'created' || status === 'dispatched';
         });
         if (!hasCreatedOrDispatched) {
@@ -145,8 +148,8 @@ const OrdersScreen = ({ navigation }) => {
     });
 
     const insertNewOrder = useCallback(
-        (newOrder) => {
-            const orderExists = orders.isAny((order) => order.id === newOrder.id);
+        newOrder => {
+            const orderExists = orders.isAny(order => order.id === newOrder.id);
 
             if (orderExists) {
                 return;
@@ -157,7 +160,7 @@ const OrdersScreen = ({ navigation }) => {
         [orders, setOrders]
     );
 
-    const onOrderPress = useCallback((order) => {
+    const onOrderPress = useCallback(order => {
         navigation.push('OrderScreen', { data: order.serialize() });
     });
 
@@ -212,7 +215,7 @@ const OrdersScreen = ({ navigation }) => {
         if (!hasCreatedOrDispatched) {
             playSound.stop();
         }
-    }, [orders])
+    }, [orders]);
 
     return (
         <View style={[tailwind('bg-gray-800 h-full')]}>
@@ -236,7 +239,7 @@ const OrdersScreen = ({ navigation }) => {
                         numDaysInWeek={5}
                         startingDate={startingDate}
                         selectedDate={date}
-                        onDateSelected={(selectedDate) => setParam('on', new Date(selectedDate))}
+                        onDateSelected={selectedDate => setParam('on', new Date(selectedDate))}
                         iconLeft={require('assets/nv-arrow-left.png')}
                         iconRight={require('assets/nv-arrow-right.png')}
                     />
@@ -248,8 +251,7 @@ const OrdersScreen = ({ navigation }) => {
                 showsVerticalScrollIndicator={false}
                 refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={() => loadOrders({ isRefreshing: true })} tintColor={getColorCode('text-blue-200')} />}
                 stickyHeaderIndices={[1]}
-                style={tailwind('w-full h-full')}
-            >
+                style={tailwind('w-full h-full')}>
                 {isQuerying && (
                     <View style={tailwind('flex items-center justify-center p-5')}>
                         <ActivityIndicator />
@@ -277,8 +279,7 @@ const OrdersScreen = ({ navigation }) => {
                                                     shadowColor: 'rgba(252, 211, 77, 1)',
                                                     marginBottom: nearbyOrders.length > 1 ? 12 : 8,
                                                 },
-                                            ]}
-                                        >
+                                            ]}>
                                             <OrderCard
                                                 headerTop={
                                                     <View style={tailwind('pt-3 pb-2 px-3')}>
@@ -295,7 +296,7 @@ const OrdersScreen = ({ navigation }) => {
                                                 orderIdStyle={tailwind('text-yellow-900')}
                                                 onPress={() => onOrderPress(order)}
                                                 badgeProps={{
-                                                    containerStyle: order.status === 'created' ? tailwind('bg-yellow-200') : {}
+                                                    containerStyle: order.status === 'created' ? tailwind('bg-yellow-200') : {},
                                                 }}
                                             />
                                         </View>
