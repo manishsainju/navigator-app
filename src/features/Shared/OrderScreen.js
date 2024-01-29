@@ -385,7 +385,7 @@ const OrderScreen = ({ navigation, route }) => {
         if (typeof metaValue === 'string' && metaValue.startsWith('http')) {
             Linking.openURL(metaValue);
         } else if (metaKey === 'customerPhone' || metaKey === 'storePhone') {
-            const phoneNumber = metaValue.replace(/[^0-9]/g, '');
+            const phoneNumber = metaValue;
             if (phoneNumber) {
                 Linking.openURL(`tel:${phoneNumber}`);
             }

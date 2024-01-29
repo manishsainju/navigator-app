@@ -42,7 +42,7 @@ const OrdersScreen = ({ navigation }) => {
     const fleetbase = useFleetbase();
     const calendar = useRef();
     const [driver, setDriver] = useDriver();
-    
+
     const [date, setDateValue] = useState(new Date());
     const [params, setParams] = useState({
         driver: driver.id,
@@ -72,7 +72,7 @@ const OrdersScreen = ({ navigation }) => {
         }
         setParams(prevParams => ({ ...prevParams, [key]: updatedValue }));
     }, []);
-    
+
     async function onAppBootstrap() {
         // Register the device with FCM
         await messaging().registerDeviceForRemoteMessages();
@@ -80,26 +80,24 @@ const OrdersScreen = ({ navigation }) => {
         // Get the token
         const token = await messaging().getToken();
         if (driver) {
-            const url = `${ADMIN_API}/v1/fleetInternal/register/fcm/${driver.id}/${token}`
-            fetch(url, {
+            const url = `${ADMIN_API}/v1/fleetInternal/register/fcm/${driver.id}/${token}`;
+            await fetch(url, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-            }).then(response => {
-                console.log(response, 'FXME, REMOVE AFTER TESTING --- TEST WORKING');
             });
         }
     }
     useEffect(() => {
         onAppBootstrap();
     }, []);
-    
+
     useEffect(() => {
         const hasCreatedOrDispatched = orders.some(order => {
             const status = order.getAttribute('status');
             console.log(status);
-            
+
             return status === 'created' || status === 'dispatched';
         });
         if (!hasCreatedOrDispatched) {
