@@ -442,7 +442,14 @@ const OrderScreen = ({ navigation, route }) => {
 
     const generateMapLink = (source, destinationPoint) => {
         if (!source && destinationPoint) {
-            const url = `https://www.google.com/maps/dir/Current+Location/${destinationPoint.location.coordinates[1]},${destinationPoint.location.coordinates[0]}`;
+            let destCoordinates;
+
+            if (typeof destinationPoint === 'string') {
+                destCoordinates = JSON.parse(destinationPoint);
+            } else if (destinationPoint && destinationPoint.location && destinationPoint.location.coordinates) {
+                destCoordinates = destinationPoint.location.coordinates;
+            }
+            const url = `https://www.google.com/maps/dir/Current+Location/${destCoordinates[1]},${destCoordinates[0]}`;
             Linking.openURL(url);
         } else if (source && destinationPoint && source.location && destinationPoint.location) {
             const {
@@ -538,7 +545,7 @@ const OrderScreen = ({ navigation, route }) => {
                             </TouchableOpacity>
 
                         )} */}
-                        <TouchableOpacity style={tailwind('mt-2')} onPress={() => generateMapLink(null, order.getAttribute('payload.pickup'))}>
+                        <TouchableOpacity style={tailwind('mt-2')} onPress={() => generateMapLink(null, order.getAttribute('meta.pickup') || order.getAttribute('payload.pickup'))}>
                             <View style={tailwind('btn bg-blue-900 border border-blue-700 py-0 px-4 w-full')}>
                                 <View style={tailwind('flex flex-row justify-start')}>
                                     <View style={tailwind('border-r border-blue-700 py-2 pr-4 flex flex-row items-center')}>
@@ -554,7 +561,7 @@ const OrderScreen = ({ navigation, route }) => {
                             </View>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={tailwind('mt-2')} onPress={() => generateMapLink(null, order.getAttribute('payload.dropoff'))}>
+                        <TouchableOpacity style={tailwind('mt-2')} onPress={() => generateMapLink(null, order.getAttribute('meta.dropoff') || order.getAttribute('payload.dropoff'))}>
                             <View style={tailwind('btn bg-red-900 border border-red-700 py-0 px-4 w-full')}>
                                 <View style={tailwind('flex flex-row justify-start')}>
                                     <View style={tailwind('border-r border-red-700 py-2 pr-4 flex flex-row items-center')}>
