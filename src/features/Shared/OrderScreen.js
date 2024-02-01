@@ -446,6 +446,7 @@ const OrderScreen = ({ navigation, route }) => {
 
             if (typeof destinationPoint === 'string') {
                 destCoordinates = JSON.parse(destinationPoint);
+                destCoordinates = [destCoordinates[1], destCoordinates[0]];
             } else if (destinationPoint && destinationPoint.location && destinationPoint.location.coordinates) {
                 destCoordinates = destinationPoint.location.coordinates;
             }
