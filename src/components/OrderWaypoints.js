@@ -125,7 +125,7 @@ const OrderWaypoints = ({ order, onPress, wrapperStyle, containerStyle, textStyl
                                         </View>
                                     </View>
                                     <View style={tailwind('w-4/5')}>
-                                        <Text style={[tailwind(`text-xs text-gray-50 ${firstWaypoint.completed ? 'line-through' : ''}`), textStyle]}>{firstWaypoint.address}</Text>
+                                        <Text style={[tailwind(`text-xs text-gray-50 ${firstWaypoint.completed ? 'line-through' : ''}`), textStyle]}>{order.meta?.storeAddress ?? firstWaypoint.address}</Text>
                                         {firstWaypoint.phone && (
                                             <TouchableOpacity onPress={() => startCall(firstWaypoint.phone)}>
                                                 <Text style={[tailwind('text-xs text-gray-50'), textStyle]}>{firstWaypoint.phone}</Text>
@@ -227,7 +227,7 @@ const OrderWaypoints = ({ order, onPress, wrapperStyle, containerStyle, textStyl
                                         </View>
                                     </View>
                                     <View style={tailwind('w-full')}>
-                                        <Text style={[tailwind(`text-xs text-gray-50 ${lastWaypoint.completed ? 'line-through' : ''}`), textStyle]}>{lastWaypoint.address}</Text>
+                                        <Text style={[tailwind(`text-xs text-gray-50 ${lastWaypoint.completed ? 'line-through' : ''}`), textStyle, {maxWidth: '80%'}]}>{order.meta?.location ?? lastWaypoint.address}</Text>
                                         {lastWaypoint.phone && (
                                             <TouchableOpacity onPress={() => startCall(lastWaypoint.phone)}>
                                                 <Text style={[tailwind('text-xs text-gray-50'), textStyle]}>{lastWaypoint.phone}</Text>

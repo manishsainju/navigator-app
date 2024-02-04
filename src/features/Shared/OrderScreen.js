@@ -86,6 +86,7 @@ const OrderScreen = ({ navigation, route }) => {
     const createdAt = format(new Date(order.getAttribute('created_at')), 'PPpp');
     const customer = order.getAttribute('customer');
     const [destination, setDestination] = useState(null);
+    const [buttonDisabled, setButtonDisabled] = useState(false);
 
     useEffect(() => {
         if (order) {
@@ -440,6 +441,17 @@ const OrderScreen = ({ navigation, route }) => {
         focusPlaceOnMap(destination);
     }
 
+    const handlePress = () => {
+        if (!buttonDisabled) {
+            setButtonDisabled(true);
+            navigation.goBack();
+
+            setTimeout(() => {
+                setButtonDisabled(false);
+            }, 1500);
+        }
+    };
+
     const generateMapLink = (source, destinationPoint) => {
         if (!source && destinationPoint) {
             let destCoordinates;
@@ -478,7 +490,7 @@ const OrderScreen = ({ navigation, route }) => {
                         </View> */}
                     </View>
                     <View>
-                        <TouchableOpacity onPress={() => navigation.goBack()} style={tailwind('')}>
+                        <TouchableOpacity onPress={handlePress} disabled={buttonDisabled} style={tailwind('')}>
                             <View style={tailwind('rounded-full bg-gray-900 w-10 h-10 flex items-center justify-center')}>
                                 <FontAwesomeIcon icon={faTimes} style={tailwind('text-red-400')} />
                             </View>

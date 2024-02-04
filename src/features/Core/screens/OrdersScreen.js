@@ -159,7 +159,7 @@ const OrdersScreen = ({ navigation }) => {
     );
 
     const onOrderPress = useCallback(order => {
-        navigation.push('OrderScreen', { data: order.serialize() });
+        navigation.navigate('OrderScreen', { data: order.serialize() });
     });
 
     useFocusEffect(

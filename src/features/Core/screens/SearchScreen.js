@@ -22,7 +22,7 @@ const SearchScreen = ({ navigation }) => {
     const [query, setQuery] = useState(null);
 
     const onOrderPress = useCallback((order) => {
-        navigation.push('OrderScreen', { data: order.serialize() });
+        navigation.navigate('OrderScreen', { data: order.serialize() });
     });
 
     const fetchResults = useCallback(async (query, cb) => {
