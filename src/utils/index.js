@@ -134,8 +134,12 @@ const totalCash = (orders = []) => {
         return 0;
     }
     const totalCod = orders.reduce((sum, order) => {
-        const cod = parseFloat(order?.meta?.cash?.replace(/[^\d.]/g, '')) || 0;
-        return sum + cod;
+        if (order.status !== 'cancelled') {
+            const cod = parseFloat(order?.meta?.cash?.replace(/[^\d.]/g, '')) || 0;
+            return sum + cod;
+        } else {
+            return sum;
+        }
     }, 0);
 
     return totalCod;
