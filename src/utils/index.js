@@ -49,6 +49,26 @@ const getActiveOrdersCount = (orders = []) => {
     return count;
 };
 
+const getActiveOrdersCountWithCompleted = (orders = []) => {
+    if (!isArray(orders)) {
+        return 0;
+    }
+
+    let count = 0;
+
+    for (let index = 0; index < orders.length; index++) {
+        const order = orders.objectAt(index);
+
+        if (order.getAttribute('status') === 'canceled' || !order.isAttributeFilled('payload')) {
+            continue;
+        }
+
+        count += 1;
+    }
+
+    return count;
+};
+
 const getTotalStops = (orders = []) => {
     if (!isArray(orders)) {
         return 0;
@@ -161,6 +181,7 @@ export {
     getCurrency,
     getDistance,
     getActiveOrdersCount,
+    getActiveOrdersCountWithCompleted,
     getTotalStops,
     getTotalDuration,
     getTotalDistance,
