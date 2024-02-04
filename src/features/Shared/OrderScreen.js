@@ -567,7 +567,7 @@ const OrderScreen = ({ navigation, route }) => {
                                     </View>
                                     <View style={tailwind('flex-1 py-2 px-2 flex items-center')}>
                                         <Text numberOfLines={1} style={tailwind('text-blue-50 text-base')}>
-                                            {order.getAttribute('payload.pickup.address')}
+                                            {order.getAttribute('meta.storeAddress') || order.getAttribute('payload.pickup.address')}
                                         </Text>
                                     </View>
                                 </View>
@@ -583,7 +583,7 @@ const OrderScreen = ({ navigation, route }) => {
                                     </View>
                                     <View style={tailwind('flex-1 py-2 px-2 flex items-center')}>
                                         <Text numberOfLines={1} style={tailwind('text-blue-50 text-base')}>
-                                            {order.getAttribute('payload.dropoff.address')}
+                                            {order.getAttribute('meta.location') || order.getAttribute('payload.dropoff.address')}
                                         </Text>
                                     </View>
                                 </View>
