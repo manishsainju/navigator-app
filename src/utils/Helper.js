@@ -493,21 +493,21 @@ export default class HelperUtil {
         socket.listener('connect');
         socket.listener('error');
 
-        // // Listen for socket connection errors
-        // (async () => {
-        //     // eslint-disable-next-line no-unused-vars
-        //     for await (let event of socket.listener('error')) {
-        //         console.log('[Socket Error]', event);
-        //     }
-        // })();
+        // Listen for socket connection errors
+        (async () => {
+            // eslint-disable-next-line no-unused-vars
+            for await (let event of socket.listener('error')) {
+                console.log('[Socket Error]', event);
+            }
+        })();
 
-        // // Listen for socket connection
-        // (async () => {
-        //     // eslint-disable-next-line no-unused-vars
-        //     for await (let event of socket.listener('connect')) {
-        //         console.log('[Socket Connected]', event);
-        //     }
-        // })();
+        // Listen for socket connection
+        (async () => {
+            // eslint-disable-next-line no-unused-vars
+            for await (let event of socket.listener('connect')) {
+                console.log('[Socket Connected]', event);
+            }
+        })();
 
         // create channel from channel id
         const channel = socket.subscribe(channelId);
@@ -546,7 +546,7 @@ export default class HelperUtil {
         const isAdhocOrder = !isOrderAssigned;
 
         let title = `📦 New Incoming Order`;
-        let message = `New order assigned ${order.id}`;
+        let message = `New order assigned ${order?.meta?.orderNumber || order.id} from ${order?.meta?.storeName || '-'} `;
         let subtitle = `Pickup at ${HelperUtil.deepGet(order, 'payload.pickup.street1')}`;
 
         if (isAdhocOrder) {
@@ -564,7 +564,8 @@ export default class HelperUtil {
         return {
             title,
             message,
-            subtitle
+            subtitle,
+            channelId: 'New-order-id'
         };
     }
 }

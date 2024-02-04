@@ -3,12 +3,17 @@
  */
 
 import { AppRegistry, Alert } from 'react-native';
+import '@azure/core-asynciterator-polyfill';
 import App from './App';
 import { name as appName } from './app.json';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import PushNotification from 'react-native-push-notification';
 import { EventRegister } from 'react-native-event-listeners';
 import { set } from 'utils/Storage';
+import { PermissionsAndroid } from 'react-native';
+PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+import messaging from '@react-native-firebase/messaging';
+import notifee from '@notifee/react-native';
 
 const { emit } = EventRegister;
 
@@ -58,13 +63,35 @@ PushNotification.configure({
     popInitialNotification: true,
 
     /**
-        * (optional) default: true
-        * - Specified if permissions (ios) and token (android and ios) will requested or not,
-        * - if not, you must call PushNotificationsHandler.requestPermissions() later
-        * - if you are not using remote notification or do not have Firebase installed, use this:
-        *     requestPermissions: Platform.OS === 'ios'
-        */
+     * (optional) default: true
+     * - Specified if permissions (ios) and token (android and ios) will requested or not,
+     * - if not, you must call PushNotificationsHandler.requestPermissions() later
+     * - if you are not using remote notification or do not have Firebase installed, use this:
+     *     requestPermissions: Platform.OS === 'ios'
+     */
     requestPermissions: true,
 });
 
+async function onMessageReceived(message) {
+    const { notification = {} } = message || {};
+    const channelId = await notifee.createChannel({
+        id: 'default',
+        name: 'Default Channel',
+    });
+    // Display a notification
+    await notifee.displayNotification({
+        title: notification?.title || 'New Message',
+        body: notification?.body || 'Open app for update',
+        android: {
+            channelId,
+            // pressAction is needed if you want the notification to open the app when pressed
+            pressAction: {
+                id: 'default',
+            },
+        },
+    });
+}
+
+messaging().onMessage(onMessageReceived);
+messaging().setBackgroundMessageHandler(onMessageReceived);
 AppRegistry.registerComponent(appName, () => App);
