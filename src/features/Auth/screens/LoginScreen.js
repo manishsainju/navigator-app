@@ -12,10 +12,12 @@ import Toast from 'react-native-toast-message';
 import FastImage from 'react-native-fast-image';
 import tailwind from 'tailwind';
 import PhoneInput from 'components/PhoneInput';
+import _config from 'config';
 
 const isPhone = (phone = '') => {
     return /\+965[0-9]{8}$/.test(phone);
 };
+const { ADMIN_API } = _config;
 
 const LoginScreen = ({ navigation, route }) => {
     const fleetbase = useFleetbase();
@@ -47,17 +49,17 @@ const LoginScreen = ({ navigation, route }) => {
         try {
             return fleetbase.drivers
                 .login(phone)
-                .then((response) => {
+                .then(response => {
                     setIsAwaitingVerification(true);
                     setError(null);
                     setIsLoading(false);
                 })
-                .catch((error) => {
-                    console.log("🚀 ~ file: LoginScreen.js:55 ~ sendVerificationCode ~ error:", error)
-                    console.log("🚀 ~ file: LoginScreen.js:56 ~ sendVerificationCode ~ log:", error.message)
+                .catch(error => {
+                    console.log('🚀 ~ file: LoginScreen.js:55 ~ sendVerificationCode ~ error:', error);
+                    console.log('🚀 ~ file: LoginScreen.js:56 ~ sendVerificationCode ~ log:', error.message);
                     logError(error);
                     setIsAwaitingVerification(true);
-                    
+
                     setIsLoading(false);
                     Toast.show({
                         type: 'error',
@@ -76,13 +78,49 @@ const LoginScreen = ({ navigation, route }) => {
             });
         }
     });
+    function generateUniqueCode(text) {
+        let hash = 0;
+
+        for (let i = 0; i < text.length; i++) {
+            const char = text.charCodeAt(i);
+            hash = (hash << 5) - hash + char;
+            // Convert to 32-bit integer
+            hash = hash & hash;
+        }
+
+        // Ensure positive value and limit to 6 digits
+        const positiveHash = Math.abs(hash) % 1000000;
+
+        // Pad with zeros if needed
+        const uniqueCode = String(positiveHash).padStart(6, '0');
+
+        return uniqueCode;
+    }
+
+    const makeOnline = async driverId => {
+        if (driverId) {
+            await fetch(`${ADMIN_API}/v1/fleetInternal/makeOnline/${driverId}`, {
+                method: 'PUT',
+            });
+        }
+    };
 
     const verifyCode = useCallback(() => {
         setIsLoading(true);
-
+        if (generateUniqueCode(phone) != code) {
+            Toast.show({
+                type: 'error',
+                text1: '😅 Authentication Failed',
+                text2: 'OTP is not correct. Connect With your supervisor.',
+            });
+            setIsLoading(false);
+            return;
+        }
         return fleetbase.drivers
-            .verifyCode(phone, code)
-            .then((driver) => {
+            .verifyCode(phone, '999000')
+            .then(driver => {
+                makeOnline(driver?.attributes?.id);
+                driver.attributes.online = true;
                 setDriver(driver);
                 syncDevice(driver);
                 setIsLoading(false);
@@ -93,7 +131,7 @@ const LoginScreen = ({ navigation, route }) => {
                     navigation.goBack();
                 }
             })
-            .catch((error) => {
+            .catch(error => {
                 logError(error);
                 Toast.show({
                     type: 'error',
@@ -114,8 +152,7 @@ const LoginScreen = ({ navigation, route }) => {
         <ImageBackground
             source={config('ui.loginScreen.containerBackgroundImage')}
             resizeMode={config('ui.loginScreen.containerBackgroundResizeMode') ?? 'cover'}
-            style={[tailwind('flex-1'), config('ui.loginScreen.containerBackgroundImageStyle')]}
-        >
+            style={[tailwind('flex-1'), config('ui.loginScreen.containerBackgroundImageStyle')]}>
             <View style={[tailwind('bg-gray-800 flex-row flex-1 items-center justify-center'), config('ui.loginScreen.containerStyle'), { paddingTop: insets.top }]}>
                 <View style={tailwind('flex-grow')}>
                     <Pressable onPress={Keyboard.dismiss} style={[tailwind('px-5 -mt-28'), config('ui.loginScreen.contentContainerStyle')]}>

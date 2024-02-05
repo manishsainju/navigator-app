@@ -208,11 +208,6 @@ export default class GeoUtil {
                     (position) => {
                         const { latitude, longitude } = position.coords;
 
-                        // if a location is stored and user is not more then 1km in distance from previous stored location skip geocode
-                        if (lastLocation && haversine([latitude, longitude], lastLocation.coordinates) > 1) {
-                            resolve(lastLocation);
-                        }
-
                         GeoUtil.geocode(latitude, longitude)
                             .then((googleAddress) => {
                                 if (!googleAddress || typeof googleAddress?.setAttribute !== 'function') {

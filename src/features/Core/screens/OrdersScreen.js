@@ -31,6 +31,7 @@ import OrderCard from 'components/OrderCard';
 import SimpleOrdersMetrics from 'components/SimpleOrdersMetrics';
 import config from 'config';
 import { playSound } from '../../../utils/playSound';
+import { useBackGroundLocation } from '../../../utils/Location';
 
 const { ADMIN_API } = config;
 const { addEventListener, removeEventListener } = EventRegister;
@@ -92,6 +93,26 @@ const OrdersScreen = ({ navigation }) => {
     useEffect(() => {
         onAppBootstrap();
     }, []);
+
+    const [location] = useBackGroundLocation();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const payload = JSON.stringify({
+                location: {
+                    longitude: location?.coords?.longitude,
+                    latitude: location?.coords?.latitude,
+                },
+            });
+            await fetch(`${ADMIN_API}/v1/fleetInternal/updateLocation/${driver.getAttribute('id')}`, {
+                method: 'PUT',
+                body: payload,
+            });
+        };
+        if (location && driver.getAttribute('id')) {
+            fetchData();
+        }
+    }, [location]);
 
     useEffect(() => {
         const hasCreatedOrDispatched = orders.some(order => {

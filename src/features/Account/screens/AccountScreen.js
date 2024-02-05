@@ -10,8 +10,10 @@ import { useLocale } from 'hooks';
 import DefaultHeader from 'components/headers/DefaultHeader';
 import FastImage from 'react-native-fast-image';
 import tailwind from 'tailwind';
+import _config from 'config';
 
 const fullHeight = Dimensions.get('window').height;
+const { ADMIN_API } = _config;
 
 const AccountScreen = ({ navigation, route }) => {
     const [driver, setDriver] = useDriver();
@@ -21,11 +23,18 @@ const AccountScreen = ({ navigation, route }) => {
     const displayHeaderComponent = config(driver ? 'ui.accountScreen.displaySignedInHeaderComponent' : 'ui.accountScreen.displaySignedOutHeaderComponent') ?? true;
     const containerHeight = displayHeaderComponent === true ? fullHeight - 224 : fullHeight;
 
-    const signOut = () => {
+    const makeOffline = async driverId => {
+        await fetch(`${ADMIN_API}/v1/fleetInternal/makeOffline/${driverId}`, {
+            method: 'PUT',
+        });
+    };
+
+    const signOut = async () => {
         navigation.reset({
             index: 0,
             routes: [{ name: 'BootScreen' }],
         });
+        await makeOffline(driver.getAttribute('id'));
         setDriver(null);
     };
 
